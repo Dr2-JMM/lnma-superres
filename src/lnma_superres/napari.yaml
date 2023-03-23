@@ -11,15 +11,12 @@ contributions:
     - id: lnma-superres.write_single_image
       python_name: lnma_superres._writer:write_single_image
       title: Save image data with superres
-    - id: lnma-superres.make_qwidget
-      python_name: lnma_superres._widget:ExampleQWidget
-      title: Make example QWidget
-    - id: lnma-superres.make_magic_widget
-      python_name: lnma_superres._widget:example_magic_widget
-      title: Make example magic widget
-    - id: lnma-superres.make_func_widget
-      python_name: lnma_superres._widget:example_function_widget
-      title: Make example function widget
+    - id: lnma-superres.make_mssr_caller
+      python_name: lnma_superres._gui_creator:mssr_caller
+      title: Make MSSR plugin GUI
+    - id: lnma-superres.make_esi_caller
+      python_name: lnma_superres._gui_creator:esi_caller
+      title: Make ESI plugin GUI
   readers:
     - command: lnma-superres.get_reader
       accepts_directories: false
@@ -32,10 +29,7 @@ contributions:
       layer_types: ['image']
       filename_extensions: ['.npy']
   widgets:
-    - command: lnma-superres.make_qwidget
-      display_name: Example QWidget
-    - command: lnma-superres.make_magic_widget
-      display_name: Example Magic Widget
-    - command: lnma-superres.make_func_widget
-      autogenerate: true
-      display_name: Example Function Widget
+    - command: lnma-superres.make_mssr_caller
+      display_name: MSSR
+    - command: lnma-superres.make_esi_caller
+      display_name: ESI

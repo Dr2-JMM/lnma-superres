@@ -1,0 +1,46 @@
+name: lnma-superres
+display_name: superres
+contributions:
+  commands:
+    - id: lnma-superres.get_reader
+      python_name: lnma_superres._reader:napari_get_reader
+      title: Open data with superres
+    - id: lnma-superres.write_multiple
+      python_name: lnma_superres._writer:write_multiple
+      title: Save multi-layer data with superres
+    - id: lnma-superres.write_single_image
+      python_name: lnma_superres._writer:write_single_image
+      title: Save image data with superres
+    - id: lnma-superres.make_qwidget
+      python_name: lnma_superres._widget:ExampleQWidget
+      title: Make example QWidget
+    - id: lnma-superres.make_magic_widget
+      python_name: lnma_superres._widget:example_magic_widget
+      title: Make example magic widget
+    - id: lnma-superres.make_widget_demo
+      python_name: lnma_superres._widget:widget_demo
+      title: Make example magic widget 2
+    # - id: lnma-superres.make_func_widget
+      # python_name: lnma_superres._widget:example_function_widget
+      # title: Make example function widget
+  readers:
+    - command: lnma-superres.get_reader
+      accepts_directories: false
+      filename_patterns: ['*.npy']
+  writers:
+    - command: lnma-superres.write_multiple
+      layer_types: ['image*','labels*']
+      filename_extensions: []
+    - command: lnma-superres.write_single_image
+      layer_types: ['image']
+      filename_extensions: ['.npy']
+  widgets:
+    - command: lnma-superres.make_widget_demo
+      display_name: My QWidget
+    - command: lnma-superres.make_qwidget
+      display_name: Example QWidget
+    - command: lnma-superres.make_magic_widget
+      display_name: Example Magic Widget
+    # - command: lnma-superres.make_func_widget
+      # autogenerate: true
+      # display_name: Example Function Widget
