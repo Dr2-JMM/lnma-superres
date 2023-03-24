@@ -187,63 +187,65 @@ class mssr_caller(QWidget):
 
 
     def _run(self):
-        #img =
-        fwhm = self.DoubleSpinBox1.value()
-        amp = self.spinBox1.value()
-        order = self.spinBox3.value()
+        if self.viewer.layers.selection.active.rgb == True:
+            raise TypeError("Only single channel images are allowed")
+        else:
+            fwhm = self.DoubleSpinBox1.value()
+            amp = self.spinBox1.value()
+            order = self.spinBox3.value()
 
-        if self.CheckBox1.checkState() == 0:
-            mesh = False
-        else:
-            mesh = True
-        if self.ComboBox4.currentText() == "Fourier":
-            ftI = True
-        else:
-            ftI = False
-        if self.CheckBox4.checkState() == 0:
-            intNorm = False
-        else:
-            intNorm = True
-        if self.CheckBox5.checkState() == 0:
-            tempAn = False
-        else:
-            tempAn = True
+            if self.CheckBox1.checkState() == 0:
+                mesh = False
+            else:
+                mesh = True
+            if self.ComboBox4.currentText() == "Fourier":
+                ftI = True
+            else:
+                ftI = False
+            if self.CheckBox4.checkState() == 0:
+                intNorm = False
+            else:
+                intNorm = True
+            if self.CheckBox5.checkState() == 0:
+                tempAn = False
+            else:
+                tempAn = True
 
-        if self.flagBatch == True:
-            self.flagBatch = False
-            for el in self.my_files:
-                img = io.imread(el)
+            if self.flagBatch == True:
+                self.flagBatch = False
+                for el in self.my_files:
+                    img = io.imread(el)
+                    if len(img.shape) == 2:
+                        processed_img = my_mssr.sfMSSR(img, fwhm, amp, order, mesh, ftI, intNorm)
+                        io.imsave(self.results_dir+"/"+"MSSR "+el.split("/").pop(),processed_img)
+                    elif len(img.shape) == 3:
+                        processed_img = my_mssr.tMSSR(img, fwhm, amp, order, mesh, ftI, intNorm)
+                        io.imsave(self.results_dir+"/"+"MSSR "+el.split("/").pop(),processed_img)
+            else:
+
+                self.selected_im_name = str(self.viewer.layers.selection.active)
+                img = self.viewer.layers[self.selected_im_name].data
+                if self.flag == True:
+                    if self.track_name not in self.viewer.layers:
+                        self.flag = False
+
                 if len(img.shape) == 2:
                     processed_img = my_mssr.sfMSSR(img, fwhm, amp, order, mesh, ftI, intNorm)
-                    io.imsave(self.results_dir+"/"+"MSSR "+el.split("/").pop(),processed_img)
-                elif len(img.shape) == 3:
-                    processed_img = my_mssr.tMSSR(img, fwhm, amp, order, mesh, ftI, intNorm)
-                    io.imsave(self.results_dir+"/"+"MSSR "+el.split("/").pop(),processed_img)
-        else:
-
-            self.selected_im_name = str(self.viewer.layers.selection.active)
-            img = self.viewer.layers[self.selected_im_name].data
-            if self.flag == True:
-                if self.track_name not in self.viewer.layers:
-                    self.flag = False
-
-            if len(img.shape) == 2:
-                processed_img = my_mssr.sfMSSR(img, fwhm, amp, order, mesh, ftI, intNorm)
-                self.viewer.add_image(processed_img, name="MSSR "+self.selected_im_name)
-            elif len(img.shape) == 3 and tempAn == False:
-                processed_img = my_mssr.tMSSR(img, fwhm, amp, order, mesh, ftI, intNorm)
-                self.track_name = "MSSR "+self.selected_im_name
-                self.viewer.add_image(processed_img, name= self.track_name)
-                self.flag = True
-            elif len(img.shape) == 3 and tempAn == True:
-                if self.flag == True:
-                    self.call_statistical_int(self.viewer.layers.selection.active.data)
-                else:
+                    self.viewer.add_image(processed_img, name="MSSR "+self.selected_im_name)
+                elif len(img.shape) == 3 and tempAn == False:
                     processed_img = my_mssr.tMSSR(img, fwhm, amp, order, mesh, ftI, intNorm)
                     self.track_name = "MSSR "+self.selected_im_name
                     self.viewer.add_image(processed_img, name= self.track_name)
-                    self.call_statistical_int(processed_img)
                     self.flag = True
+                elif len(img.shape) == 3 and tempAn == True:
+                    if self.flag == True:
+                        self.call_statistical_int(self.viewer.layers.selection.active.data)
+                    else:
+                        processed_img = my_mssr.tMSSR(img, fwhm, amp, order, mesh, ftI, intNorm)
+                        self.track_name = "MSSR "+self.selected_im_name
+                        self.viewer.add_image(processed_img, name= self.track_name)
+                        self.call_statistical_int(processed_img)
+                        self.flag = True
 
 
     def call_statistical_int(self,processed_img):
