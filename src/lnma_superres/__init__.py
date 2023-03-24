@@ -14,4 +14,5 @@ __all__ = (
     "write_multiple",
     "mssr_caller",
     "esi_caller",
+    "SplitChannelsWidget",
 )

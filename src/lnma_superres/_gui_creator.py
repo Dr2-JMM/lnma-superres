@@ -1,5 +1,5 @@
 """
-This module is creates the GUI for the FF SRM methods 
+This module is creates the GUI for the FF SRM methods
 """
 from typing import TYPE_CHECKING
 #from napari.layers import Image, Labels, Layer, Points
@@ -19,6 +19,7 @@ if TYPE_CHECKING:
     import napari
 
 import napari
+from napari.types import ImageData
 import numpy as np
 from vispy.color import Colormap
 import os
@@ -280,3 +281,43 @@ class esi_caller(QWidget):
         self.layout().addWidget(label1)
 
     #Rest of methods of the esi_caller class
+
+class SplitChannelsWidget(QWidget):
+
+    def __init__(self, napari_viewer):
+        super().__init__()
+        self.viewer = napari_viewer
+
+        # Create a layout for the widget
+        layout = QVBoxLayout()
+
+        # Create a button to trigger the channel splitting
+        self.split_button = QPushButton("Split Channels")
+        self.split_button.clicked.connect(self.split_channels)
+        layout.addWidget(self.split_button)
+
+        # Set the layout for the widget
+        self.setLayout(layout)
+
+    def split_channels(self):
+        # Get the active layer data from napari
+        layer_data = self.viewer.layers.selection.active.data
+
+        # Check if the layer is an RGB image
+        if layer_data.ndim != 3 or layer_data.shape[-1] != 3:
+            raise TypeError("The current layer is not an RGB image")
+
+        # Split the RGB image into separate channels
+        red = layer_data[:, :, 0]
+        green = layer_data[:, :, 1]
+        blue = layer_data[:, :, 2]
+
+        # Create three new ImageData objects for each channel
+        red_data = ImageData(red)
+        green_data = ImageData(green)
+        blue_data = ImageData(blue)
+
+        # Create three LayerDataTuple objects to add the new layers to napari
+        self.viewer.add_image(data=red_data, name="Red", colormap="red")
+        self.viewer.add_image(data=green_data, name="Green", colormap="green")
+        self.viewer.add_image(data=blue_data, name="Blue", colormap="blue")

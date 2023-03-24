@@ -17,6 +17,9 @@ contributions:
     - id: lnma-superres.make_esi_caller
       python_name: lnma_superres._gui_creator:esi_caller
       title: Make ESI plugin GUI
+    - id: lnma-superres.make_SplitChannel
+      python_name: lnma_superres._gui_creator:SplitChannelsWidget
+      title: Make Split Channel plugin
   readers:
     - command: lnma-superres.get_reader
       accepts_directories: false
@@ -33,3 +36,5 @@ contributions:
       display_name: MSSR
     - command: lnma-superres.make_esi_caller
       display_name: ESI
+    - command: lnma-superres.make_SplitChannel
+      display_name: Split Channels
