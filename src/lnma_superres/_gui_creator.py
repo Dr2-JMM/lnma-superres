@@ -1,10 +1,5 @@
 """
-This module is an example of a barebones QWidget plugin for napari
-
-It implements the Widget specification.
-see: https://napari.org/stable/plugins/guides.html?#widgets
-
-Replace code below according to your needs.
+This module is creates the GUI for the FF SRM methods 
 """
 from typing import TYPE_CHECKING
 #from napari.layers import Image, Labels, Layer, Points
@@ -143,11 +138,6 @@ class mssr_caller(QWidget):
         self.layout().addWidget(btnG)
 
 #Rest of methods of the mssr_caller class
-
-    def _on_click(self):
-        print("napari has", len(self.viewer.layers), "layers")
-        print(self.lay)
-
     def setTemp(self,d):
         if d == True:
             self.labelT.setHidden(False)
