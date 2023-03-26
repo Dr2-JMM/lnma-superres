@@ -93,7 +93,7 @@ class mssr_caller(QWidget):
         self.labelT.setHidden(True)
         self.ComboBoxT = QComboBox()
         self.ComboBoxT.clear()
-        self.ComboBoxT.addItems(["TPM","Var","Mean","SOFI","Variation Coefficient"])
+        self.ComboBoxT.addItems(["TPM","Var","Mean","SOFI","CV·σ"])
         self.ComboBoxT.currentTextChanged.connect(self.onActivated)
         self.ComboBoxT.setHidden(True)
 
@@ -253,8 +253,8 @@ class mssr_caller(QWidget):
         elif staMeth == "SOFI":
             tIm = my_mssr.TRAC(processed_img, self.spinBoxS.value())
             print("SOFI")
-        elif staMeth == "Variation Coefficient":
-            print("Variation Coefficient")
+        elif staMeth == "CV·σ":
+            print("Coefficient of Variation times Standard Deviation")
             tIm = my_mssr.varCoef(processed_img)
         if self.flag == True:
             self.viewer.add_image(tIm, name="t"+self.selected_im_name+" "+staMeth)
