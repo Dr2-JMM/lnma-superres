@@ -22,8 +22,15 @@ https://napari.org/stable/plugins/index.html
 -->
 
 ## Installation
+First install napari viewer:
 
-You can install `lnma-superres` via [pip]:
+    conda create -y -n napari-env -c conda-forge python=3.9
+    conda activate napari-env
+    pip install "napari[all]"
+
+For details check: https://napari.org/stable/
+
+Then, you can install `lnma-superres` napari plugins via [pip]:
 
     pip install lnma-superres
 
