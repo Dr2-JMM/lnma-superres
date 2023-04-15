@@ -1,3 +1,4 @@
+import numba
 import numpy as np
 import math
 import scipy.interpolate as interpolate
@@ -64,57 +65,68 @@ class mssr_class:
         imgF = (img + imgS1 + imgS2 + imgS3 + imgS4) / 5
         return imgF
 
-    #Spatial MSSR
-    def sfMSSR(self,img, fwhm, amp, order, mesh = True, ftI = False, intNorm = True):
-        hs = round(0.5*fwhm*amp)
+    @staticmethod
+    @numba.njit(parallel=True)
+    def extract_max_diff(img, hs):
+        height, width = img.shape
+        max_diff = np.zeros((height, width))
+        for i in numba.prange(height):
+            for j in numba.prange(width):
+                max_diff[i, j] = np.max(
+                    np.abs(img[max(i - hs, 0) : i + hs + 1, max(j - hs, 0) : j + hs + 1] - img[i, j])
+                )
+        return max_diff
+
+    @staticmethod
+    @numba.njit(parallel=True)
+    def build_mean_shift(padded: np.ndarray, hs: int, max_diff: np.ndarray, kernel: np.ndarray):
+        height, width = padded.shape
+        y = np.zeros((height - 2 * hs, width - 2 * hs), dtype=np.float64)
+        for i in numba.prange(height - 2 * hs):
+            for j in numba.prange(width - 2 * hs):
+                window = padded[i : i + 2 * hs + 1, j : j + 2 * hs + 1]
+                weights = np.exp(-(((window - padded[i + hs, j + hs]) / max_diff[i, j]) ** 2)) * kernel
+                y[i, j] = (window * weights).sum() / weights.sum()
+
+        return y
+
+    # Spatial MSSR
+    def sfMSSR(self, img, fwhm, amp, order, mesh=True, ftI=False, intNorm=True):
+        if not np.issubdtype(img.dtype, np.floating):
+            img = img.astype(np.float64)  # Convert any int into float64
+
+        hs = round(0.5 * fwhm * amp)
         if hs < 1:
             hs = 1
-        #maxValueImgOr = (max(map(max, img)))
-        if(amp > 1 and not ftI):
+
+        if amp > 1 and not ftI:
             img = self.bicInter(img, amp, mesh)
-        elif(amp > 1 and ftI):
+        elif amp > 1 and ftI:
             img = self.ftInterp(img, amp, mesh)
-        width, height = img.shape
-        xPad = np.pad(img, hs, 'symmetric')
-        M = np.zeros((width,height))
-        for i in range(-hs, hs+1):
-            for j in range(-hs, hs+1):
-                if i!=0 or j!=0:
-                    xThis = xPad[hs+i:width+hs+i, hs+j:height+hs+j]
-                    M = np.maximum(M, np.absolute(img-xThis))
 
-        weightAccum = np.zeros((width,height))
-        yAccum = np.zeros((width,height))
+        max_diff = self.extract_max_diff(img, hs)
+        max_diff[max_diff == 0] = 1  # Prevent 0 division
 
-        for i in range(-hs, hs+1):
-            for j in range(-hs, hs+1):
-                if i!=0 or j!=0:
-                    spatialkernel = np.exp(-(pow(i,2)+pow(j,2))/pow((hs),2))
-                    xThis = xPad[hs+i:width+hs+i, hs+j:height+hs+j]
-                    M[M==0] = 1
-                    xDiffSq0 = pow((img-xThis)/M,2)
-                    intensityKernel = np.exp(-xDiffSq0)
-                    weightThis = spatialkernel*intensityKernel
-                    weightAccum = weightAccum + weightThis
-                    yAccum = yAccum + (xThis*weightThis)
-
-        MS = img - (yAccum/weightAccum)
+        i = np.arange(-hs, hs + 1)
+        j = np.arange(-hs, hs + 1)
+        kernel = np.exp(-(i[None] ** 2 + j[:, None] ** 2) / hs**2)
+        kernel[hs, hs] = 0
+        MS = img - self.build_mean_shift(np.pad(img, hs, "symmetric"), hs, max_diff, kernel)
         MS[MS < 0] = 0
-        MS[np.isnan(MS)] = 0
 
-        I3 = MS/(max(map(max, MS)))
-        x3 = img/(max(map(max, img)))
+        I3 = MS / MS.max()
+        x3 = img / img.max()
         for i in range(order):
             I4 = x3 - I3
-            I5 = max(map(max, I4)) - I4
-            I5 = I5/max(map(max, I5))
-            I6 = I5*I3
-            I7 = I6/max(map(max, I6))
+            I5 = I4.max() - I4
+            I5 = I5 / I5.max()
+            I6 = I5 * I3
+            I7 = I6 / I6.max()
             x3 = I3
             I3 = I7
         I3[np.isnan(I3)] = 0
         if intNorm:
-            IMSSR = I3*img
+            IMSSR = I3 * img
         else:
             IMSSR = I3
         return IMSSR
