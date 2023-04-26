@@ -28,6 +28,8 @@ import sys
 
 from .core_mssr import mssr_class
 from .my_popW import Ui_MainWindow
+from .core_decor import *
+
 
 #Import MSSR core
 my_mssr = mssr_class()
@@ -159,10 +161,41 @@ class mssr_caller(QWidget):
         self.msg.setupUi(self.msg)
         self.msg.retranslateUi(self.msg)
         self.msg.pushButtonCom.clicked.connect(self.bypass)
+        self.msg.pushButtonCom2.clicked.connect(self.decorr)
         self.msg.show()
 
     def bypass(self):
         self.DoubleSpinBox1.setValue(self.msg.su_resul())
+
+
+    def decorr(self):
+        # load image
+        image = self.viewer.layers.selection.active.data
+
+        pps = 5  # projected pixel size of 15nm
+        # typical parameters for resolution estimate
+        Nr = 50
+        Ng = 10
+        r = np.linspace(0, 1, Nr)
+        GPU = False
+
+        # Apodize image edges with a cosine function over 20 pixels
+        image, mask = apodImRect(image, 20)
+
+        # Compute resolution
+        figID = 100
+        if GPU:
+            from numba import cuda
+            image_gpu = cuda.to_device(image)
+            kcMax, A0, _, _ = getDcorr(image_gpu, r, Ng, figID)
+        else:
+            kcMax, A0, _, _ = getDcorr(image, r, Ng, figID)
+        # Max resolution in pixels
+        res = 2/kcMax
+
+        #print(f'kcMax : {kcMax:.3f}, A0 : {A0[0]:.3f}')
+        #print(f'Resolution: {2/kcMax:.3f}, [pixels]')
+        self.DoubleSpinBox1.setValue(res)
 
 
     def batch(self):
