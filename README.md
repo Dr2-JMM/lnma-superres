@@ -7,7 +7,18 @@
 [![codecov](https://codecov.io/gh/Dr2-JMM/lnma-superres/branch/main/graph/badge.svg)](https://codecov.io/gh/Dr2-JMM/lnma-superres)
 [![napari hub](https://img.shields.io/endpoint?url=https://api.napari-hub.org/shields/lnma-superres)](https://napari-hub.org/plugins/lnma-superres)
 
-FF-SRM methods
+
+A plugin for super-resolution microscopy FF-SRM methods.
+
+Open-source implementation of methods for Fluorescence Fluctuation based Super Resolution Microscopy (FF-SRM):
+
+Review: [Alva et al., 2022. “Fluorescence Fluctuation-Based Super-Resolution Microscopy: Basic Concepts for an Easy Start.” Journal of Microscopy, August. https://doi.org/10.1111/jmi.13135](https://onlinelibrary.wiley.com/doi/10.1111/jmi.13135)
+
+MSSR article: [Torres-García, E., Pinto-Cámara, R., Linares, A. et al. Extending resolution within a single imaging frame. Nat Commun 13, 7452 (2022). https://doi.org/10.1038/s41467-022-34693-9](https://doi.org/10.1038/s41467-022-34693-9)
+
+Implemented methods so far:
+- MSSR
+<!-- - ESI -->
 
 ----------------------------------
 
@@ -30,9 +41,9 @@ First install napari viewer:
 
 For details check: https://napari.org/stable/
 
-Then, you can install `lnma-superres` napari plugins via [pip]:
+<!-- Then, you can install `lnma-superres` napari plugins via [pip]:
 
-    pip install lnma-superres
+    pip install lnma-superres -->
 
 
 

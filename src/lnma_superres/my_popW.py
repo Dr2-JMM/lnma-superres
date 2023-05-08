@@ -12,6 +12,7 @@ from qtpy import QtCore, QtGui, QtWidgets
 import sys
 
 
+
 class Ui_MainWindow(QtWidgets.QMainWindow):
     def __init__ ( self, parent = None ):
             QtWidgets.QMainWindow.__init__(self, parent)
@@ -46,11 +47,17 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 "background-color: rgb(65, 72, 81);")
         self.doubleSpinBoxP.setObjectName("doubleSpinBoxP")
         self.pushButtonCom = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButtonCom.setGeometry(QtCore.QRect(130, 300, 112, 34))
+        self.pushButtonCom.setGeometry(QtCore.QRect(50, 300, 112, 34))
         self.pushButtonCom.setStyleSheet("color: rgb(255, 255, 255);\n"
 "background-color: rgb(65, 72, 81);\n"
 "font: 75 8pt \"MS Shell Dlg 2\";")
         self.pushButtonCom.setObjectName("pushButtonCom")
+        self.pushButtonCom2 = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButtonCom2.setGeometry(QtCore.QRect(210, 300, 112, 34))
+        self.pushButtonCom2.setStyleSheet("color: rgb(255, 255, 255);\n"
+"background-color: rgb(65, 72, 81);\n"
+"font: 75 8pt \"MS Shell Dlg 2\";")
+        self.pushButtonCom2.setObjectName("pushButtonCom2")
         self.label_3P = QtWidgets.QLabel(self.centralwidget)
         self.label_3P.setGeometry(QtCore.QRect(30, 180, 201, 25))
         self.label_3P.setStyleSheet("color: rgb(255, 255, 255);\n"
@@ -115,6 +122,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.label_4P.setText(_translate("MainWindow", "Pixel Size [nm]"))
         self.label_2P.setText(_translate("MainWindow", "Objective NA"))
         self.pushButtonCom.setText(_translate("MainWindow", "Compute"))
+        self.pushButtonCom2.setText(_translate("MainWindow", "Decorrelation"))
         self.label_3P.setText(_translate("MainWindow", "Emission Wavelength [nm]"))
         self.labelP.setText(_translate("MainWindow", "Oil (or Air) RI"))
         self.label0P.setText(_translate("MainWindow", "Medium RI"))
@@ -126,6 +134,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #print("success",fwhm_res)
         return fwhm_res
         #print(self.textbox1.text())
+
+
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
