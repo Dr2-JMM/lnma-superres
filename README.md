@@ -52,12 +52,10 @@ For details check: https://napari.org/stable/
 
 To install latest development version :
 
-    Be sure that you have installed [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-
-    and then just:
-
     pip install git+https://github.com/Dr2-JMM/lnma-superres.git
 
+
+You might need to install [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) first. 
 
 ## Contributing
 
