@@ -19,9 +19,13 @@ MSSR article: [Torres-García, E., Pinto-Cámara, R., Linares, A. et al. Extendi
 ESI article: [Idir Yahiatene, Simon Hennig, Marcel Müller, Thomas Huser (2015/2016). "Entropy-based Super-resolution Imaging (ESI): From Disorder to Fine Detail"
 ACS Photonics. https://doi.org/10.1021/acsphotonics.5b00307](https://doi.org/10.1021/acsphotonics.5b00307)
 
+SOFI article: [Fast, background-free, 3D super-resolution optical fluctuation imaging (SOFI)](https://doi.org/10.1073/pnas.0907866106)
+
 Implemented methods so far:
 - MSSR
 - ESI
+- SOFI
+- Split channels
 
 ----------------------------------
 
@@ -55,7 +59,7 @@ To install latest development version :
     pip install git+https://github.com/Dr2-JMM/lnma-superres.git
 
 
-You might need to install [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) first. 
+You might need to install [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) first.
 
 ## Contributing
 
