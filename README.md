@@ -12,14 +12,15 @@ A plugin for super-resolution microscopy FF-SRM methods.
 
 Open-source implementation of methods for Fluorescence Fluctuation based Super Resolution Microscopy (FF-SRM):
 
-Review: [Alva et al., 2022. “Fluorescence Fluctuation-Based Super-Resolution Microscopy: Basic Concepts for an Easy Start.” Journal of Microscopy, August. https://doi.org/10.1111/jmi.13135](https://onlinelibrary.wiley.com/doi/10.1111/jmi.13135)
+Review: [Alva et al., 2022. “Fluorescence Fluctuation-Based Super-Resolution Microscopy: Basic Concepts for an Easy Start.” Journal of Microscopy, August.](https://onlinelibrary.wiley.com/doi/10.1111/jmi.13135)
 
-MSSR article: [Torres-García, E., Pinto-Cámara, R., Linares, A. et al. Extending resolution within a single imaging frame. Nat Commun 13, 7452 (2022). https://doi.org/10.1038/s41467-022-34693-9](https://doi.org/10.1038/s41467-022-34693-9)
+MSSR article: [Torres-García, E., Pinto-Cámara, R., Linares, A. et al. Extending resolution within a single imaging frame. Nat Commun 13, 7452 (2022).](https://doi.org/10.1038/s41467-022-34693-9)
 
-ESI article: [Idir Yahiatene, Simon Hennig, Marcel Müller, Thomas Huser (2015/2016). "Entropy-based Super-resolution Imaging (ESI): From Disorder to Fine Detail"
-ACS Photonics. https://doi.org/10.1021/acsphotonics.5b00307](https://doi.org/10.1021/acsphotonics.5b00307)
+ESI article: [Idir Yahiatene, Simon Hennig, Marcel Müller, Thomas Huser (2015/2016). "Entropy-based Super-resolution Imaging (ESI): From Disorder to Fine Detail" ACS Photonics.](https://doi.org/10.1021/acsphotonics.5b00307)
 
 SOFI article: [Fast, background-free, 3D super-resolution optical fluctuation imaging (SOFI)](https://doi.org/10.1073/pnas.0907866106)
+
+[PySOFI](https://github.com/xiyuyi-at-LLNL/pysofi) GitHub repository
 
 Implemented methods so far:
 - MSSR
