@@ -20,13 +20,15 @@ ESI article: [Idir Yahiatene, Simon Hennig, Marcel Müller, Thomas Huser (2015/2
 
 SOFI article: [Fast, background-free, 3D super-resolution optical fluctuation imaging (SOFI)](https://doi.org/10.1073/pnas.0907866106)
 
-[PySOFI](https://github.com/xiyuyi-at-LLNL/pysofi) GitHub repository
-
-Implemented methods so far:
+Methods implemented:
 - MSSR
 - ESI
 - SOFI
 - Split channels
+
+Repositories available:
+- [ESI](https://github.com/biophotonics-bielefeld/ESI) GitHub repository
+- [PySOFI](https://github.com/xiyuyi-at-LLNL/pysofi) GitHub repository
 
 ----------------------------------
 
