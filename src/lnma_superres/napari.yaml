@@ -23,6 +23,9 @@ contributions:
     - id: lnma-superres.make_srrf_caller
       python_name: lnma_superres._gui_creator:srrf_caller
       title: Make SRRF plugin GUI
+    - id: lnma-superres.make_musical_caller
+      python_name: lnma_superres._gui_creator:musical_caller
+      title: Make MUSICAL plugin GUI
     - id: lnma-superres.make_SplitChannel
       python_name: lnma_superres._gui_creator:SplitChannelsWidget
       title: Make Split Channel plugin
@@ -46,5 +49,7 @@ contributions:
       display_name: SOFI
     - command: lnma-superres.make_srrf_caller
       display_name: SRRF
+    - command: lnma-superres.make_musical_caller
+      display_name: MUSICAL
     - command: lnma-superres.make_SplitChannel
       display_name: Split Channels
