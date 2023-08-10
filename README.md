@@ -74,6 +74,10 @@ or install latest development version :
 
 You might need to install [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) first.
 
+### User guide
+
+A complete user guide can be found [here.](https://github.com/Dr2-JMM/lnma-superres/blob/main/docs/user%20guide.pdf)
+
 ----------------------------------
 Examples of use:
 
