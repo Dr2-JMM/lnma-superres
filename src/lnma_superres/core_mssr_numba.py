@@ -79,45 +79,45 @@ class mssr_class:
 
     #Bicubic Interpolation
     def bicInter(self,img, amp, mesh):
-    	width, height = img.shape
-    	y=np.linspace(1, width, width)
-    	x=np.linspace(1, height, height)
-    	imgInter=interpolate.interp2d(x, y, img, kind='cubic')
-    	y2=np.linspace(1, width, width*amp)
-    	x2=np.linspace(1, height, height*amp)
-    	Z2 = imgInter(x2, y2)
-    	if mesh:
-    		Z2 = self.meshing(Z2, amp)
-    	return Z2
+        width, height = img.shape
+        y=np.linspace(1, width, width)
+        x=np.linspace(1, height, height)
+        imgInter=interpolate.interp2d(x, y, img, kind='cubic')
+        y2=np.linspace(1, width, width*amp)
+        x2=np.linspace(1, height, height*amp)
+        Z2 = imgInter(x2, y2)
+        if mesh:
+            Z2 = self.meshing(Z2, amp)
+        return Z2
 
     #Fourier Interpolation
     def ftInterp(self,img, amp, mesh):
-    	width, height = img.shape
-    	mdX = math.ceil(width/2) + 1
-    	mdY = math.ceil(height/2) + 1
+        width, height = img.shape
+        mdX = math.ceil(width/2) + 1
+        mdY = math.ceil(height/2) + 1
 
-    	extraBorder = math.ceil(amp/2)
-    	Nwidth = (width*amp) + extraBorder
-    	Nheight = (height*amp) + extraBorder
+        extraBorder = math.ceil(amp/2)
+        Nwidth = (width*amp) + extraBorder
+        Nheight = (height*amp) + extraBorder
 
-    	lnX = len(np.arange((mdX),width))
-    	lnY = len(np.arange((mdY),height))
+        lnX = len(np.arange((mdX),width))
+        lnY = len(np.arange((mdY),height))
 
-    	imgFt = np.fft.fft2(img)
-    	imgFt = imgFt * (Nwidth/width) * (Nheight/height)
+        imgFt = np.fft.fft2(img)
+        imgFt = imgFt * (Nwidth/width) * (Nheight/height)
     #	imgFt = imgFt * amp * amp
 
-    	fM = np.zeros((Nwidth, Nheight), dtype=complex)
-    	fM[0:mdX, 0:mdY] = imgFt[0:mdX, 0:mdY]; #izq sup cuadrante
-    	fM[0:mdX, (Nheight-lnY):Nheight] = imgFt[0:mdX, (mdY):height]; #der sup cuadrante
-    	fM[(Nwidth-lnX):Nwidth, 0:mdY] = imgFt[(mdX):width, 0:mdY]; #izq inf cuadrante
-    	fM[(Nwidth-lnX):Nwidth, (Nheight-lnY):Nheight] = imgFt[(mdX):width, (mdY):height]; #der inf cuadrante
+        fM = np.zeros((Nwidth, Nheight), dtype=complex)
+        fM[0:mdX, 0:mdY] = imgFt[0:mdX, 0:mdY]; #izq sup cuadrante
+        fM[0:mdX, (Nheight-lnY):Nheight] = imgFt[0:mdX, (mdY):height]; #der sup cuadrante
+        fM[(Nwidth-lnX):Nwidth, 0:mdY] = imgFt[(mdX):width, 0:mdY]; #izq inf cuadrante
+        fM[(Nwidth-lnX):Nwidth, (Nheight-lnY):Nheight] = imgFt[(mdX):width, (mdY):height]; #der inf cuadrante
 
-    	Z2 = (np.fft.ifft2(fM)).real
-    	Z2 = Z2[0:(width*amp), 0:(height*amp)]
-    	if mesh:
-    		Z2 = self.meshing(Z2, amp)
-    	return Z2
+        Z2 = (np.fft.ifft2(fM)).real
+        Z2 = Z2[0:(width*amp), 0:(height*amp)]
+        if mesh:
+            Z2 = self.meshing(Z2, amp)
+        return Z2
 
     #Mesh compensation
     def meshing(self,img, amp):
@@ -200,21 +200,21 @@ class mssr_class:
 
     #Temporal MSSR
     def tMSSR(self,img_layer, fwhm, amp, order, mesh = True, ftI = False, intNorm = True, device="cuda"):
-    	img=np.array(img_layer.data)
-    	nFrames, width, height = img.shape
-    	imgMSSR = np.zeros((nFrames,width*amp,height*amp))
-    	for nI in range(nFrames):
-    		print("Image " + str(nI+1))
-    		imgMSSR[nI, :, :] = self.sfMSSR(img[nI], fwhm, amp, order, mesh, ftI, intNorm, device)
-    	return imgMSSR
+        img=np.array(img_layer.data)
+        nFrames, width, height = img.shape
+        imgMSSR = np.zeros((nFrames,width*amp,height*amp))
+        for nI in range(nFrames):
+            print("Image " + str(nI+1))
+            imgMSSR[nI, :, :] = self.sfMSSR(img[nI], fwhm, amp, order, mesh, ftI, intNorm, device)
+        return imgMSSR
 
     #Mean
     def tMean(self,img):
-    	return np.mean(img, 0)
+        return np.mean(img, 0)
 
     #Variance
     def tVar(self,img):
-    	return np.var(img, 0)
+        return np.var(img, 0)
 
     #Temporal Product Mean (TPM)
     def TPM(self,img):
@@ -257,18 +257,18 @@ class mssr_class:
 
     #Empirical cumulative distribution function
     def ecdf(self,data):
-    	""" Compute ECDF """
-    	data = np.reshape(data, -1)
-    	x = np.sort(data)
-    	n = len(x)
-    	y = np.arange(1, n+1) / n
-    	return(x,y)
+        """ Compute ECDF """
+        data = np.reshape(data, -1)
+        x = np.sort(data)
+        n = len(x)
+        y = np.arange(1, n+1) / n
+        return(x,y)
 
     #Exclude Outliers
     def excOutliers(self,data, th):
-    	th = (100 - th)/100
-    	x, f = self.ecdf(data)
-    	found = np.where(f > th)
-    	mnX = x[found[0][0]];
-    	data = np.where(data >= mnX, mnX, data)
-    	return data
+        th = (100 - th)/100
+        x, f = self.ecdf(data)
+        found = np.where(f > th)
+        mnX = x[found[0][0]]
+        data = np.where(data >= mnX, mnX, data)
+        return data
