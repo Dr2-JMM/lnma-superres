@@ -1,9 +1,75 @@
 import numba
+import numba.cuda
 import numpy as np
 import math
 import scipy.interpolate as interpolate
-#from napari.layers import Image, Labels, Layer, Points
-#import matplotlib.pyplot as plt
+
+
+@numba.njit(parallel=True)
+def cpu_max_diff(img: np.ndarray, hs: int) -> np.ndarray:
+    height, width = img.shape
+    max_diff = np.zeros((height, width))
+    for i in numba.prange(height):
+        for j in numba.prange(width):
+            max_diff[i, j] = np.max(np.abs(img[max(i - hs, 0) : i + hs + 1, max(j - hs, 0) : j + hs + 1] - img[i, j]))
+    return max_diff
+
+
+@numba.njit(parallel=True)
+def cpu_mean_shift(padded: np.ndarray, hs: int, max_diff: np.ndarray, kernel: np.ndarray) -> np.ndarray:
+    height, width = padded.shape
+    y = np.zeros((height - 2 * hs, width - 2 * hs), dtype=np.float64)
+    for i in numba.prange(height - 2 * hs):
+        for j in numba.prange(width - 2 * hs):
+            window = padded[i : i + 2 * hs + 1, j : j + 2 * hs + 1]
+            weights = np.exp(-(((window - padded[i + hs, j + hs]) / max_diff[i, j]) ** 2)) * kernel
+            y[i, j] = (window * weights).sum() / weights.sum()
+
+    return y
+
+
+# These will be compiled using the first visible device.
+# As compiling is expensive, we should not let the user switch device at runtime
+# But the user can switch device before running the code by setting CUDA_VISIBLE_DEVICES variable
+@numba.cuda.jit()
+def cuda_max_diff(img: np.ndarray, hs: int, output: np.ndarray):
+    i, j = numba.cuda.grid(2)
+    if i >= output.shape[0]:
+        return
+    if j >= output.shape[1]:
+        return
+    value = 0
+    for k in range(i - hs, i + hs + 1):
+        if k < 0 or k >= img.shape[0]:
+            continue
+        for l in range(j - hs, j + hs + 1):
+            if l < 0 or l >= img.shape[1]:
+                continue
+            value = max(abs(img[k, l] - img[i, j]), value)
+
+    output[i, j] = value if value > 0 else 1
+
+
+@numba.cuda.jit()
+def cuda_mean_shift(padded: np.ndarray, hs: int, max_diff: np.ndarray, kernel: np.ndarray, output: np.ndarray):
+    i, j = numba.cuda.grid(2)
+    if i >= output.shape[0]:
+        return
+    if j >= output.shape[1]:
+        return
+    cum_value = 0
+    cum_weight = 0
+    for k in range(2 * hs + 1):
+        for l in range(2 * hs + 1):
+            weight = (padded[i + k, j + l] - padded[i + hs, j + hs]) / max_diff[i, j]
+            weight = math.exp(-(weight**2)) * kernel[k, l]
+
+            cum_weight += weight
+            cum_value += padded[i + k, j + l] * weight
+
+    output[i, j] = cum_value / cum_weight
+
+
 
 class mssr_class:
     def __init__(self):
@@ -65,33 +131,18 @@ class mssr_class:
         imgF = (img + imgS1 + imgS2 + imgS3 + imgS4) / 5
         return imgF
 
-    @staticmethod
-    @numba.njit(parallel=True)
-    def extract_max_diff(img, hs):
-        width, height = img.shape
-        max_diff = np.zeros((width, height))
-        for i in numba.prange(width):
-            for j in numba.prange(width):
-                max_diff[i, j] = np.max(
-                    np.abs(img[max(i - hs, 0) : i + hs + 1, max(j - hs, 0) : j + hs + 1] - img[i, j])
-                )
-        return max_diff
-
-    @staticmethod
-    @numba.njit(parallel=True)
-    def build_mean_shift(padded: np.ndarray, hs: int, max_diff: np.ndarray, kernel: np.ndarray):
-        height, width = padded.shape
-        y = np.zeros((height - 2 * hs, width - 2 * hs), dtype=np.float64)
-        for i in numba.prange(height - 2 * hs):
-            for j in numba.prange(width - 2 * hs):
-                window = padded[i : i + 2 * hs + 1, j : j + 2 * hs + 1]
-                weights = np.exp(-(((window - padded[i + hs, j + hs]) / max_diff[i, j]) ** 2)) * kernel
-                y[i, j] = (window * weights).sum() / weights.sum()
-
-        return y
 
     # Spatial MSSR
-    def sfMSSR(self, img, fwhm, amp, order, mesh=True, ftI=False, intNorm=True):
+    def sfMSSR(self, img, fwhm, amp, order, mesh=True, ftI=False, intNorm=True, device="cuda"):
+        assert device in ("cpu", "cuda")
+
+        if device == "cuda" and not numba.cuda.is_available():
+            print("GPU not supported on this system, switch to cpu")
+            device = "cpu"
+
+        if not np.issubdtype(img.dtype, np.floating):
+            img = img.astype(np.float64)  # Convert any int into float64
+
         hs = round(0.5 * fwhm * amp)
         if hs < 1:
             hs = 1
@@ -101,16 +152,35 @@ class mssr_class:
         elif amp > 1 and ftI:
             img = self.ftInterp(img, amp, mesh)
 
-        max_diff = self.extract_max_diff(img, hs)
-        max_diff[max_diff == 0] = 1  # Prevent 0 division
-
         i = np.arange(-hs, hs + 1)
         j = np.arange(-hs, hs + 1)
         kernel = np.exp(-(i[None] ** 2 + j[:, None] ** 2) / hs**2)
         kernel[hs, hs] = 0
-        MS = img - self.build_mean_shift(np.pad(img, hs, "symmetric"), hs, max_diff, kernel)
-        MS[MS < 0] = 0
 
+
+        if device == "cpu":
+            max_diff = cpu_max_diff(img, hs)
+            max_diff[max_diff == 0] = 1  # Prevent 0 division
+            MS = img - cpu_mean_shift(np.pad(img, hs, "symmetric"), hs, max_diff, kernel)
+        else:
+            max_tpb = numba.cuda.get_current_device().MAX_THREADS_PER_BLOCK
+            max_tpb = 20
+            tpb = int(math.sqrt(max_tpb))
+            blocks = (math.ceil(img.shape[0] / tpb), math.ceil(img.shape[1] / tpb))
+
+            max_diff = numba.cuda.device_array_like(img)
+            output = numba.cuda.device_array_like(img)
+            cuda_max_diff[blocks, (tpb, tpb)](numba.cuda.to_device(img), hs, max_diff)
+            cuda_mean_shift[blocks, (tpb, tpb)](
+                numba.cuda.to_device(np.pad(img, hs, "symmetric")),
+                hs,
+                max_diff,
+                numba.cuda.to_device(kernel),
+                output,
+            )
+            MS = img - output
+
+        MS[MS < 0] = 0
         I3 = MS / MS.max()
         x3 = img / img.max()
         for i in range(order):
@@ -129,13 +199,13 @@ class mssr_class:
         return IMSSR
 
     #Temporal MSSR
-    def tMSSR(self,img_layer, fwhm, amp, order, mesh = True, ftI = False, intNorm = True):
+    def tMSSR(self,img_layer, fwhm, amp, order, mesh = True, ftI = False, intNorm = True, device="cuda"):
     	img=np.array(img_layer.data)
     	nFrames, width, height = img.shape
     	imgMSSR = np.zeros((nFrames,width*amp,height*amp))
     	for nI in range(nFrames):
     		print("Image " + str(nI+1))
-    		imgMSSR[nI, :, :] = self.sfMSSR(img[nI], fwhm, amp, order, mesh, ftI, intNorm)
+    		imgMSSR[nI, :, :] = self.sfMSSR(img[nI], fwhm, amp, order, mesh, ftI, intNorm, device)
     	return imgMSSR
 
     #Mean
