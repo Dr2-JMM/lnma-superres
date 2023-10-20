@@ -98,8 +98,7 @@ A complete user guide with the graphical installation instructions included can 
 
 | **Original**  | **SRRF** |
 | --- | --- |
-|<p align="center"> <img src="docs/DL-230627_4ch_time_series_63X_Zoom_1.8X_LA1_pixelDwell_0.34us_LowerLaserPower_Confocal.png
-" width=50% height=50%> </p> | <p align="center"> <img src="docs/docs/SRRF-C3-230627_4ch_time_series_63X_Zoom_1.8X_LA1_pixelDwell_0.34us_LowerLaserPower_Confocal.png" width=50% height=50%> </p>|
+|<p align="center"> <img src="docs/DL-230627_4ch_time_series_63X_Zoom_1.8X_LA1_pixelDwell_0.34us_LowerLaserPower_Confocal.png" width=50% height=50%> </p> | <p align="center"> <img src="docs/SRRF-C3-230627_4ch_time_series_63X_Zoom_1.8X_LA1_pixelDwell_0.34us_LowerLaserPower_Confocal.png" width=50% height=50%> </p>|
 | Parameters: | Amplification: 2, Spatial radius: 5, Symmetry Axis: 6, Start frame: 0, End frame: 48|
 
 | **Original**  | **MUSICAL** |
